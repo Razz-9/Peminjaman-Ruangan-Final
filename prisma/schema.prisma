@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model bookings {
+  id           Int      @id
+  room_id      Int?
+  name         String   @db.VarChar(255)
+  phone        String?  @db.VarChar(50)
+  unit_kerja   String?  @db.VarChar(255)
+  booking_date DateTime @db.Date
+  start_time   DateTime @db.Time(6)
+  end_time     DateTime @db.Time(6)
+  status       String?  @db.VarChar(50)
+  rooms        rooms?   @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model rooms {
+  id          Int        @id
+  name        String     @db.VarChar(255)
+  capacity    Int?
+  floor       String?    @db.VarChar(50)
+  amenities   String?
+  image       String?    @db.VarChar(255)
+  description String?
+  bookings    bookings[]
+}
+
+model users {
+  id       Int    @id
+  username String @unique @db.VarChar(255)
+  password String @db.VarChar(255)
+  role     String @db.VarChar(50)
+}

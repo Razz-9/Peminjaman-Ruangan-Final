@@ -14,7 +14,7 @@ async function setupDatabase() {
 
   try {
     // Create database
-    await adminPool.query("CREATE DATABASE pelni_booking")
+    await adminPool.query("CREATE DATABASE pelni_db")
     console.log("✅ Database created")
   } catch (err) {
     if (err.code === "42P04") {
@@ -28,11 +28,11 @@ async function setupDatabase() {
 
   // Connect to our database
   const pool = new Pool({
-    user: "postgres",
+    user: "pelni_user",
     host: "localhost",
-    database: "pelni_booking",
-    password: process.env.POSTGRES_PASSWORD || "postgres",
-    port: 5432,
+    database: "pelni_db",
+    password: process.env.POSTGRES_PASSWORD || "Pelni2025",
+    port: 5434,
   })
 
   try {

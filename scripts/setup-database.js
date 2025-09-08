@@ -1,25 +1,32 @@
-const { pool, client, testConnection } = require("../lib/db")
-const bcrypt = require("bcryptjs")
+// scripts/setup-database.js (Versi Perbaikan Final)
+
+const { Pool, Client } = require("pg");
+const bcrypt = require("bcryptjs");
+
+// Konfigurasi koneksi database langsung di sini
+const dbConfig = {
+  host: "localhost",
+  port: 5434, // Pastikan port ini 5434
+  user: "pelni_user",
+  password: "Pelni2025",
+  database: "pelni_booking",
+};
+
+// Fungsi untuk membuat koneksi baru
+const createClient = () => new Client(dbConfig);
 
 async function setupDatabase() {
-  let dbClient
+  let dbClient;
 
   try {
-    console.log("🚀 Setting up PELNI Room Booking Database...")
-    console.log("==========================================")
+    console.log("🚀 Setting up PELNI Room Booking Database...");
+    console.log("==========================================");
 
-    // Test connection first
-    console.log("1. Testing database connection...")
-    const isConnected = await testConnection()
-    if (!isConnected) {
-      throw new Error("Cannot connect to database")
-    }
+    dbClient = createClient();
+    await dbClient.connect();
+    console.log("✅ Connection successful.");
 
-    // Create a new client for setup
-    dbClient = client()
-    await dbClient.connect()
-
-    console.log("2. Creating tables...")
+    console.log("2. Creating tables...");
 
     // Create rooms table
     await dbClient.query(`
@@ -35,7 +42,7 @@ async function setupDatabase() {
           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
-    `)
+    `);
 
     // Create bookings table
     await dbClient.query(`
@@ -54,7 +61,7 @@ async function setupDatabase() {
           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
-    `)
+    `);
 
     // Create admins table
     await dbClient.query(`
@@ -66,23 +73,22 @@ async function setupDatabase() {
           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
-    `)
+    `);
 
-    console.log("✅ Tables created successfully")
+    console.log("✅ Tables created successfully");
 
-    console.log("3. Creating indexes...")
+    // Lanjutan (indeks, trigger, data) di sini...
+    // (Kode selanjutnya tidak perlu diubah)
 
-    // Create indexes
-    await dbClient.query("CREATE INDEX IF NOT EXISTS idx_bookings_room_id ON bookings(room_id)")
-    await dbClient.query("CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date)")
-    await dbClient.query("CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status)")
-    await dbClient.query("CREATE INDEX IF NOT EXISTS idx_rooms_active ON rooms(is_active)")
 
-    console.log("✅ Indexes created successfully")
+    console.log("3. Creating indexes...");
+    await dbClient.query("CREATE INDEX IF NOT EXISTS idx_bookings_room_id ON bookings(room_id)");
+    await dbClient.query("CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date)");
+    await dbClient.query("CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status)");
+    await dbClient.query("CREATE INDEX IF NOT EXISTS idx_rooms_active ON rooms(is_active)");
+    console.log("✅ Indexes created successfully");
 
-    console.log("4. Creating triggers...")
-
-    // Create updated_at trigger function
+    console.log("4. Creating triggers...");
     await dbClient.query(`
       CREATE OR REPLACE FUNCTION update_updated_at_column()
       RETURNS TRIGGER AS $$
@@ -91,35 +97,26 @@ async function setupDatabase() {
           RETURN NEW;
       END;
       $$ language 'plpgsql'
-    `)
-
-    // Create triggers
+    `);
     await dbClient.query(`
       DROP TRIGGER IF EXISTS update_rooms_updated_at ON rooms;
       CREATE TRIGGER update_rooms_updated_at BEFORE UPDATE ON rooms
           FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
-    `)
-
+    `);
     await dbClient.query(`
       DROP TRIGGER IF EXISTS update_bookings_updated_at ON bookings;
       CREATE TRIGGER update_bookings_updated_at BEFORE UPDATE ON bookings
           FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
-    `)
-
+    `);
     await dbClient.query(`
       DROP TRIGGER IF EXISTS update_admins_updated_at ON admins;
       CREATE TRIGGER update_admins_updated_at BEFORE UPDATE ON admins
           FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
-    `)
+    `);
+    console.log("✅ Triggers created successfully");
 
-    console.log("✅ Triggers created successfully")
-
-    console.log("5. Inserting admin user...")
-
-    // Hash password for admin user
-    const hashedPassword = await bcrypt.hash("password", 10)
-
-    // Insert admin user
+    console.log("5. Inserting admin user...");
+    const hashedPassword = await bcrypt.hash("password", 10);
     await dbClient.query(
       `
       INSERT INTO admins (username, password_hash, name) 
@@ -127,13 +124,10 @@ async function setupDatabase() {
       ON CONFLICT (username) DO NOTHING
     `,
       ["admin", hashedPassword, "Administrator"],
-    )
+    );
+    console.log("✅ Admin user created (username: admin, password: password)");
 
-    console.log("✅ Admin user created (username: admin, password: password)")
-
-    console.log("6. Inserting sample rooms...")
-
-    // Insert sample rooms
+    console.log("6. Inserting sample rooms...");
     const rooms = [
       {
         id: "550e8400-e29b-41d4-a716-446655440001",
@@ -162,8 +156,7 @@ async function setupDatabase() {
         description: "Ruangan meeting di lantai 3 dengan pemandangan yang baik dan fasilitas lengkap.",
         image: "/placeholder.svg?height=200&width=300",
       },
-    ]
-
+    ];
     for (const room of rooms) {
       await dbClient.query(
         `
@@ -172,14 +165,11 @@ async function setupDatabase() {
         ON CONFLICT (id) DO NOTHING
       `,
         [room.id, room.name, room.capacity, room.floor, room.amenities, room.description, room.image],
-      )
+      );
     }
+    console.log("✅ Sample rooms inserted");
 
-    console.log("✅ Sample rooms inserted")
-
-    console.log("7. Inserting sample bookings...")
-
-    // Insert sample bookings
+    console.log("7. Inserting sample bookings...");
     const bookings = [
       {
         room_id: "550e8400-e29b-41d4-a716-446655440001",
@@ -211,8 +201,7 @@ async function setupDatabase() {
         end_time: "12:30",
         status: "rejected",
       },
-    ]
-
+    ];
     for (const booking of bookings) {
       await dbClient.query(
         `
@@ -229,44 +218,20 @@ async function setupDatabase() {
           booking.end_time,
           booking.status,
         ],
-      )
+      );
     }
+    console.log("✅ Sample bookings inserted");
+    
+    console.log("\n🎉 Database setup completed successfully!");
+    console.log("\n🚀 You can now run: npm run dev");
 
-    console.log("✅ Sample bookings inserted")
-
-    console.log("8. Verifying setup...")
-
-    // Verify data
-    const roomCount = await dbClient.query("SELECT COUNT(*) FROM rooms")
-    const bookingCount = await dbClient.query("SELECT COUNT(*) FROM bookings")
-    const adminCount = await dbClient.query("SELECT COUNT(*) FROM admins")
-
-    console.log("📊 Database Summary:")
-    console.log(`   - Rooms: ${roomCount.rows[0].count}`)
-    console.log(`   - Bookings: ${bookingCount.rows[0].count}`)
-    console.log(`   - Admins: ${adminCount.rows[0].count}`)
-
-    console.log("")
-    console.log("🎉 Database setup completed successfully!")
-    console.log("")
-    console.log("📝 Login credentials:")
-    console.log("   Username: admin")
-    console.log("   Password: password")
-    console.log("")
-    console.log("🚀 You can now run: npm run dev")
   } catch (error) {
-    console.error("❌ Database setup failed:", error.message)
-    console.error("Full error:", error)
+    console.error("❌ Database setup failed:", error.message);
   } finally {
     if (dbClient) {
-      await dbClient.end()
+      await dbClient.end();
     }
   }
 }
 
-// Run setup if this file is executed directly
-if (require.main === module) {
-  setupDatabase()
-}
-
-module.exports = { setupDatabase }
+setupDatabase();

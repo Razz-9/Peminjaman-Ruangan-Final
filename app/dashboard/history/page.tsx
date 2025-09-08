@@ -104,18 +104,35 @@ export default function AdminHistory() {
     })
 
   const calculateDuration = (startTime: string, endTime: string): string => {
-    const start = new Date(`2000-01-01T${startTime}:00`)
-    const end = new Date(`2000-01-01T${endTime}:00`)
-    const diffMs = end.getTime() - start.getTime()
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+    if (!startTime || !endTime) {
+      return "-";
+    }
+    const start = new Date(`2000-01-01T${startTime}`);
+    const end = new Date(`2000-01-01T${endTime}`);
 
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return "-";
+    }
+
+    const diffMs = end.getTime() - start.getTime();
+    
+    if (diffMs < 0) {
+        return "Invalid";
+    }
+
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (diffHours === 0 && diffMinutes === 0) {
+      return "0 mnt";
+    }
+    
     if (diffHours === 0) {
-      return `${diffMinutes} ${t("time.min")}`
+      return `${diffMinutes} ${t("time.min")}`;
     } else if (diffMinutes === 0) {
-      return `${diffHours} ${t("time.hour")}`
+      return `${diffHours} ${t("time.hour")}`;
     } else {
-      return `${diffHours} ${t("time.hour")} ${diffMinutes} ${t("time.min")}`
+      return `${diffHours} ${t("time.hour")} ${diffMinutes} ${t("time.min")}`;
     }
   }
 

@@ -11,7 +11,6 @@ import { useLanguage } from "@/contexts/LanguageContext"
 import { format } from "date-fns"
 import Link from "next/link"
 
-// Dynamic room colors based on room ID
 const getRoomColor = (roomId: string, rooms: any[]) => {
   const roomIndex = rooms.findIndex((room) => room.id === roomId)
   const colors = [
@@ -28,7 +27,6 @@ const getRoomColor = (roomId: string, rooms: any[]) => {
 }
 
 export default function UserDashboard() {
-  // Set to current date (2025)
   const [currentDate, setCurrentDate] = useState(new Date())
   const { bookings, rooms, getRoomById } = useData()
   const { isAuthenticated } = useAuth()
@@ -60,12 +58,10 @@ export default function UserDashboard() {
   const renderCalendarDays = () => {
     const days = []
 
-    // Empty cells for days before the first day of the month
     for (let i = 0; i < firstDayWeekday; i++) {
       days.push(<div key={`empty-${i}`} className="p-3 min-h-[100px]"></div>)
     }
 
-    // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dayBookings = getBookingsForDate(day)
       const hasEvents = dayBookings.length > 0
@@ -87,10 +83,10 @@ export default function UserDashboard() {
                 return (
                   <div
                     key={index}
-                    className={`text-xs px-2 py-1 rounded-md font-medium border ${colorClass}`}
+                    className={`text-xs p-2 rounded-lg font-medium border ${colorClass}`}
                     title={`${room?.name} - ${booking.startTime}-${booking.endTime}`}
                   >
-                    {booking.startTime}-{booking.endTime}
+                    <div className="font-semibold truncate">{booking.startTime}-{booking.endTime}</div>
                     <div className="text-xs opacity-75 truncate">{room?.name}</div>
                   </div>
                 )
@@ -101,11 +97,9 @@ export default function UserDashboard() {
         </div>,
       )
     }
-
     return days
   }
-
-  // Generate day names array
+  
   const dayNames = Array.from({ length: 7 }, (_, i) => getDayName(i))
 
   return (
@@ -124,7 +118,7 @@ export default function UserDashboard() {
               </Button>
             </Link>
           )}
-          {rooms.map((room, index) => {
+          {rooms.map((room) => {
             const colorClass = getRoomColor(room.id, rooms)
             return (
               <Badge key={room.id} variant="outline" className={colorClass}>
@@ -161,7 +155,6 @@ export default function UserDashboard() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="grid grid-cols-7 gap-0">
-            {/* Day headers */}
             {dayNames.map((day) => (
               <div
                 key={day}
@@ -170,8 +163,6 @@ export default function UserDashboard() {
                 {day}
               </div>
             ))}
-
-            {/* Calendar days */}
             {renderCalendarDays()}
           </div>
         </CardContent>

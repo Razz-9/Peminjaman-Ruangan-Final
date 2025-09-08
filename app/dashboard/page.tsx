@@ -9,7 +9,7 @@ import { useData } from "@/contexts/DataContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { format } from "date-fns"
 
-// Dynamic room colors based on room ID
+// Function for header room badges AND calendar events
 const getRoomColor = (roomId: string, rooms: any[]) => {
   const roomIndex = rooms.findIndex((room) => room.id === roomId)
   const colors = [
@@ -26,7 +26,6 @@ const getRoomColor = (roomId: string, rooms: any[]) => {
 }
 
 export default function Dashboard() {
-  // Set to current date (2025)
   const [currentDate, setCurrentDate] = useState(new Date())
   const { bookings, rooms, getRoomById } = useData()
   const { t, getMonthName, getDayName } = useLanguage()
@@ -72,12 +71,10 @@ export default function Dashboard() {
   const renderCalendarDays = () => {
     const days = []
 
-    // Empty cells for days before the first day of the month
     for (let i = 0; i < firstDayWeekday; i++) {
       days.push(<div key={`empty-${i}`} className="p-3 min-h-[120px]"></div>)
     }
 
-    // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dayBookings = getBookingsForDate(day)
       const hasEvents = dayBookings.length > 0
@@ -100,14 +97,12 @@ export default function Dashboard() {
                 return (
                   <div
                     key={index}
-                    className={`text-xs px-2 py-1 rounded-md font-medium border ${colorClass} ${statusRing} relative`}
+                    className={`text-xs p-2 rounded-lg font-medium border ${colorClass} ${statusRing}`}
                     title={`${room?.name} - ${booking.name} (${t(`status.${booking.status}`)})`}
                   >
-                    <div className="truncate">
-                      {booking.startTime}-{booking.endTime}
-                    </div>
-                    <div className="text-xs opacity-75 truncate">{room?.name}</div>
-                    <div className="text-xs opacity-60 truncate">{booking.name}</div>
+                    <div className="font-semibold truncate">{booking.startTime}-{booking.endTime}</div>
+                    <div className="truncate">{room?.name}</div>
+                    <div className="text-xs opacity-80 truncate">{booking.name}</div>
                   </div>
                 )
               })}
@@ -123,7 +118,6 @@ export default function Dashboard() {
     return days
   }
 
-  // Generate day names array
   const dayNames = Array.from({ length: 7 }, (_, i) => getDayName(i))
 
   return (
@@ -134,7 +128,7 @@ export default function Dashboard() {
           <p className="text-gray-600 mt-1">{t("dashboard.subtitle")}</p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
-          {rooms.map((room, index) => {
+          {rooms.map((room) => {
             const colorClass = getRoomColor(room.id, rooms)
             return (
               <Badge key={room.id} variant="outline" className={colorClass}>
@@ -145,21 +139,20 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Legend */}
       <Card className="shadow-sm border border-gray-200">
         <CardContent className="p-4">
           <div className="flex items-center gap-6 flex-wrap">
             <span className="text-sm font-medium text-gray-700">{t("dashboard.legend")}</span>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded border-2 border-green-400 bg-green-100"></div>
+              <div className="w-4 h-4 rounded border-2 border-green-400"></div>
               <span className="text-sm text-gray-700">{t("dashboard.approved")}</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded border-2 border-blue-400 bg-blue-100"></div>
+              <div className="w-4 h-4 rounded border-2 border-blue-400"></div>
               <span className="text-sm text-gray-700">{t("dashboard.active")}</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded border-2 border-yellow-400 bg-yellow-100"></div>
+              <div className="w-4 h-4 rounded border-2 border-yellow-400"></div>
               <span className="text-sm text-gray-700">{t("dashboard.pending")}</span>
             </div>
             <div className="flex items-center gap-2">
@@ -196,7 +189,6 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="grid grid-cols-7 gap-0">
-            {/* Day headers */}
             {dayNames.map((day) => (
               <div
                 key={day}
@@ -205,8 +197,6 @@ export default function Dashboard() {
                 {day}
               </div>
             ))}
-
-            {/* Calendar days */}
             {renderCalendarDays()}
           </div>
         </CardContent>

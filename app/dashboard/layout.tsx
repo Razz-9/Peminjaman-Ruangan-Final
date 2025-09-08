@@ -37,7 +37,6 @@ export default function DashboardLayout({
 
   const navigation = [
     { name: t("dashboard.overview"), href: "/dashboard", icon: Home },
-    { name: t("dashboard.calendar"), href: "/dashboard/calendar", icon: Calendar },
     { name: t("dashboard.bookings"), href: "/dashboard/booking", icon: ClipboardList },
     { name: t("dashboard.rooms"), href: "/dashboard/rooms", icon: Building2 },
     { name: t("dashboard.history"), href: "/dashboard/history", icon: History },
@@ -51,13 +50,8 @@ export default function DashboardLayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Link href="/dashboard" className="flex items-center">
-                <div className="flex-shrink-0">
-                  <img className="h-8 w-8" src="/images/logo.png" alt="Logo" />
-                </div>
-                <div className="ml-3">
-                  <h1 className="text-xl font-semibold text-gray-900">{t("dashboard.title")}</h1>
-                </div>
+              <Link href="/dashboard">
+                <img className="h-8 w-auto" src="/images/logo.png" alt="Logo" />
               </Link>
             </div>
 

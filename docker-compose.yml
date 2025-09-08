@@ -5,7 +5,7 @@ services:
     image: postgres:15
     container_name: pelni_postgres
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: pelni_booking # Change this line
       POSTGRES_USER: pelni_user
       POSTGRES_PASSWORD: Pelni2025
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"

@@ -34,6 +34,13 @@ const translations = {
     "dashboard.active": "Sedang Berlangsung",
     "dashboard.pending": "Menunggu Persetujuan",
     "dashboard.legend": "Keterangan:",
+    "dashboard.overview": "Beranda",
+    "dashboard.calendar": "Kalender",
+    "dashboard.bookings": "Pemesanan",
+    "dashboard.rooms": "Ruangan",
+    "dashboard.history": "Riwayat",
+    "dashboard.settings": "Pengaturan",
+    "dashboard.logout": "Keluar",
 
     // Booking
     "booking.title": "Pesan Ruangan",
@@ -122,7 +129,7 @@ const translations = {
     "status.active": "Berlangsung",
     "status.completed": "Selesai",
 
-    // Smart Assistant - Fixed all mixed languages
+    // Smart Assistant
     "assistant.title": "Asisten Pintar",
     "assistant.suggestions": "Saran berdasarkan data booking terkini",
     "assistant.weekdayOptimal": "Hari {0} Masih Optimal",
@@ -235,6 +242,13 @@ const translations = {
     "dashboard.active": "Active",
     "dashboard.pending": "Pending",
     "dashboard.legend": "Legend:",
+    "dashboard.overview": "Overview",
+    "dashboard.calendar": "Calendar",
+    "dashboard.bookings": "Bookings",
+    "dashboard.rooms": "Rooms",
+    "dashboard.history": "History",
+    "dashboard.settings": "Settings",
+    "dashboard.logout": "Logout",
 
     // Booking
     "booking.title": "Book Room",
@@ -323,7 +337,7 @@ const translations = {
     "status.active": "Active",
     "status.completed": "Completed",
 
-    // Smart Assistant - Fixed all mixed languages
+    // Smart Assistant
     "assistant.title": "Smart Assistant",
     "assistant.suggestions": "Smart suggestions based on current booking data",
     "assistant.weekdayOptimal": "{0} is Optimal",

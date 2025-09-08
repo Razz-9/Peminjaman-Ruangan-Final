@@ -6,7 +6,7 @@ const config = {
   port: 5434, // port Postgres default
   user: "pelni_user", // user dari docker env kamu
   password: "Pelni2025", // password sesuai docker env
-  database: "pelni_db", // nama database yang dibuat di docker env
+  database: "pelni_booking", // nama database yang dibuat di docker env
 }
 
 // Use Pool for better connection management

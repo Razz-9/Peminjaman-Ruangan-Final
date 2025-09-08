@@ -18,7 +18,8 @@ export async function GET() {
       name: row.name,
       phone: row.phone,
       unitKerja: row.unit_kerja,
-      bookingDate: row.booking_date,
+      // PERBAIKAN: Format tanggal secara eksplisit sebelum dikirim
+      bookingDate: new Date(row.booking_date).toISOString().split('T')[0],
       startTime: row.start_time,
       endTime: row.end_time,
       status: row.status,
@@ -79,7 +80,8 @@ export async function POST(request: NextRequest) {
       name: result.rows[0].name,
       phone: result.rows[0].phone,
       unitKerja: result.rows[0].unit_kerja,
-      bookingDate: result.rows[0].booking_date,
+      // PERBAIKAN (Konsistensi): Format tanggal juga di sini
+      bookingDate: new Date(result.rows[0].booking_date).toISOString().split('T')[0],
       startTime: result.rows[0].start_time,
       endTime: result.rows[0].end_time,
       status: result.rows[0].status,

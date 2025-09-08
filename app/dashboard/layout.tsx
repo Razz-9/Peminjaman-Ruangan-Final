@@ -1,15 +1,15 @@
 "use client"
 
 import type React from "react"
-
 import { useAuth } from "@/contexts/AuthContext"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Calendar, Home, History, Settings, LogOut, Building2, ClipboardList } from "lucide-react"
+import { Home, History, Settings, LogOut, Building2, ClipboardList } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { LanguageToggle } from "@/components/language-toggle"
+import { cn } from "@/lib/utils"
 
 export default function DashboardLayout({
   children,
@@ -19,6 +19,7 @@ export default function DashboardLayout({
   const { isAuthenticated, logout } = useAuth()
   const { t } = useLanguage()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -44,54 +45,59 @@ export default function DashboardLayout({
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Link href="/dashboard">
-                <img className="h-8 w-auto" src="/images/logo.png" alt="Logo" />
-              </Link>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <LanguageToggle />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLogout}
-                className="flex items-center gap-2 bg-transparent"
-              >
-                <LogOut className="h-4 w-4" />
-                {t("dashboard.logout")}
-              </Button>
-            </div>
-          </div>
+    // Mengubah container utama menjadi flexbox
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
+      <nav className="w-64 bg-white shadow-sm border-r">
+        {/* Logo dipindahkan ke sini, di dalam sidebar */}
+        <div className="flex h-16 items-center border-b px-6">
+          <Link href="/dashboard">
+            <img className="h-8 w-auto" src="/images/logo.png" alt="Logo" />
+          </Link>
         </div>
-      </header>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <nav className="w-64 bg-white shadow-sm min-h-screen">
-          <div className="p-4">
-            <ul className="space-y-2">
-              {navigation.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors"
-                  >
-                    <item.icon className="mr-3 h-5 w-5" />
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+        {/* Menu navigasi */}
+        <div className="p-4">
+          <ul className="space-y-2">
+            {navigation.map((item) => (
+              <li key={item.name}>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                    pathname === item.href
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                  )}
+                >
+                  <item.icon className="mr-3 h-5 w-5" />
+                  {item.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
+
+      {/* Wrapper untuk konten utama */}
+      <div className="flex flex-1 flex-col">
+        {/* Header baru hanya untuk tombol aksi */}
+        <header className="flex h-16 items-center justify-end border-b bg-white px-6">
+          <div className="flex items-center gap-4">
+            <LanguageToggle />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="flex items-center gap-2 bg-transparent"
+            >
+              <LogOut className="h-4 w-4" />
+              {t("dashboard.logout")}
+            </Button>
           </div>
-        </nav>
+        </header>
 
-        {/* Main Content */}
+        {/* Konten Halaman */}
         <main className="flex-1 p-6">{children}</main>
       </div>
     </div>

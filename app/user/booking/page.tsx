@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -135,6 +134,7 @@ export default function BookingPage() {
         status: "pending",
       })
       setShowSuccess(true)
+      handleReset(); // Membersihkan form setelah berhasil
     } catch (error) {
       setErrors({ submit: t("booking.errorSubmit") })
     } finally {
@@ -206,54 +206,34 @@ export default function BookingPage() {
         <p className="text-gray-600 mt-1">{t("booking.subtitle")}</p>
       </div>
 
-      {/* Booking Form */}
-      <div className="max-w-4xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("booking.bookRoom")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Personal Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("booking.bookRoom")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {/* Perubahan utama: Menggunakan grid untuk layout 2 kolom */}
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Kolom Kiri: Form */}
+            <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">{t("booking.name")} *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder={t("booking.namePlaceholder")}
-                    className={errors.name ? "border-red-500" : ""}
-                  />
+                  <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder={t("booking.namePlaceholder")} className={errors.name ? "border-red-500" : ""} />
                   {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="phone">{t("booking.phone")} *</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder={t("booking.phonePlaceholder")}
-                    className={errors.phone ? "border-red-500" : ""}
-                  />
+                  <Input id="phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder={t("booking.phonePlaceholder")} className={errors.phone ? "border-red-500" : ""} />
                   {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="unitKerja">{t("booking.unit")} *</Label>
-                <Input
-                  id="unitKerja"
-                  value={formData.unitKerja}
-                  onChange={(e) => setFormData({ ...formData, unitKerja: e.target.value })}
-                  placeholder={t("booking.unitPlaceholder")}
-                  className={errors.unitKerja ? "border-red-500" : ""}
-                />
+                <Input id="unitKerja" value={formData.unitKerja} onChange={(e) => setFormData({ ...formData, unitKerja: e.target.value })} placeholder={t("booking.unitPlaceholder")} className={errors.unitKerja ? "border-red-500" : ""} />
                 {errors.unitKerja && <p className="text-sm text-red-500">{errors.unitKerja}</p>}
               </div>
 
-              {/* Room Selection */}
               <div className="space-y-2">
                 <Label>{t("booking.selectRoom")} *</Label>
                 <Select value={formData.roomId} onValueChange={(value) => setFormData({ ...formData, roomId: value })}>
@@ -261,134 +241,55 @@ export default function BookingPage() {
                     <SelectValue placeholder={t("booking.selectRoomPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {rooms
-                      .filter((room) => room.isActive)
-                      .map((room) => (
-                        <SelectItem key={room.id} value={room.id}>
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
-                            {room.name} - {room.floor} ({room.capacity})
-                          </div>
-                        </SelectItem>
-                      ))}
+                    {rooms.filter((room) => room.isActive).map((room) => (
+                      <SelectItem key={room.id} value={room.id}>{room.name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 {errors.roomId && <p className="text-sm text-red-500">{errors.roomId}</p>}
               </div>
 
-              {/* Date Selection */}
               <div className="space-y-2">
                 <Label>{t("booking.date")} *</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={`w-full justify-start text-left font-normal ${errors.bookingDate ? "border-red-500" : ""}`}
-                    >
+                    <Button variant="outline" className={`w-full justify-start text-left font-normal ${errors.bookingDate ? "border-red-500" : ""}`}>
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {selectedDate ? format(selectedDate, "PPP") : t("booking.selectDate")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={handleDateSelect}
-                      disabled={(date) => isPastDate(date) || isWeekend(date)}
-                      initialFocus
-                    />
+                    <Calendar mode="single" selected={selectedDate} onSelect={handleDateSelect} disabled={(date) => isPastDate(date) || isWeekend(date)} initialFocus />
                   </PopoverContent>
                 </Popover>
                 {errors.bookingDate && <p className="text-sm text-red-500">{errors.bookingDate}</p>}
-                <p className="text-sm text-amber-600">{t("booking.weekendNote")}</p>
               </div>
 
-              {/* Time Selection */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>{t("booking.startTime")} *</Label>
-                  <TimePicker
-                    value={formData.startTime}
-                    onChange={(time) => setFormData({ ...formData, startTime: time })}
-                    placeholder={t("booking.selectStartTime")}
-                  />
+                  <TimePicker value={formData.startTime} onChange={(time) => setFormData({ ...formData, startTime: time })} placeholder={t("booking.selectStartTime")} />
                   {errors.startTime && <p className="text-sm text-red-500">{errors.startTime}</p>}
                 </div>
-
                 <div className="space-y-2">
                   <Label>{t("booking.endTime")} *</Label>
-                  <TimePicker
-                    value={formData.endTime}
-                    onChange={(time) => setFormData({ ...formData, endTime: time })}
-                    placeholder={t("booking.selectEndTime")}
-                  />
+                  <TimePicker value={formData.endTime} onChange={(time) => setFormData({ ...formData, endTime: time })} placeholder={t("booking.selectEndTime")} />
                   {errors.endTime && <p className="text-sm text-red-500">{errors.endTime}</p>}
                 </div>
               </div>
-              <p className="text-sm text-gray-600">{t("booking.timeNote")}</p>
-
-              {/* Notes */}
+              
               <div className="space-y-2">
                 <Label htmlFor="notes">Catatan (Opsional)</Label>
-                <Textarea
-                  id="notes"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Tambahkan catatan untuk booking ini..."
-                  rows={3}
-                />
+                <Textarea id="notes" value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder="Tambahkan catatan untuk booking ini..." rows={3} />
               </div>
-
-              {/* Room Details */}
-              {selectedRoom && (
-                <Card className="bg-gray-50">
-                  <CardContent className="pt-4">
-                    <h3 className="font-semibold mb-2">{selectedRoom.name}</h3>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <span>{selectedRoom.floor}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-gray-500" />
-                        <span>{selectedRoom.capacity}</span>
-                      </div>
-                    </div>
-                    <div className="mt-3">
-                      <p className="text-sm font-medium mb-2">{t("booking.facilities")}:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedRoom.amenities.map((amenity, index) => (
-                          <span
-                            key={index}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-white rounded-md text-xs"
-                          >
-                            {amenity === "WiFi" && <Wifi className="h-3 w-3" />}
-                            {amenity === "Projector" && <Monitor className="h-3 w-3" />}
-                            {amenity === "Coffee Machine" && <Coffee className="h-3 w-3" />}
-                            {amenity}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    {selectedRoom.description && (
-                      <div className="mt-3">
-                        <p className="text-sm font-medium mb-1">{t("booking.roomDescription")}:</p>
-                        <p className="text-sm text-gray-600">{selectedRoom.description}</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Submit Error */}
+              
               {errors.submit && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-md">
                   <p className="text-sm text-red-600">{errors.submit}</p>
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="flex gap-4">
+              <div className="flex gap-4 pt-4 border-t">
                 <Button type="submit" disabled={isSubmitting} className="flex-1">
                   {isSubmitting ? t("booking.submitting") : t("booking.submit")}
                 </Button>
@@ -396,10 +297,36 @@ export default function BookingPage() {
                   {t("booking.reset")}
                 </Button>
               </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+            </div>
+
+            {/* Kolom Kanan: Detail Ruangan */}
+            <div className="space-y-4">
+              {selectedRoom && (
+                <Card className="shadow-sm border border-gray-200 sticky top-6">
+                  <CardContent className="p-4">
+                    <img src={selectedRoom.image || "/placeholder.svg"} alt={selectedRoom.name} className="w-full h-48 object-cover rounded-lg mb-4" />
+                    <h3 className="font-semibold text-lg text-gray-900 mb-3">{selectedRoom.name}</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium flex items-center gap-1"><Users className="h-4 w-4" />{selectedRoom.capacity}</span>
+                        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center gap-1"><MapPin className="h-4 w-4" />{selectedRoom.floor}</span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">{t("booking.facilities")}</p>
+                        <p className="text-gray-600 text-sm mb-2">{selectedRoom.amenities.join(", ")}</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">{t("booking.roomDescription")}</p>
+                        <p className="text-gray-600 text-sm leading-relaxed">{selectedRoom.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

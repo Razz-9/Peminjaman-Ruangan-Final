@@ -16,7 +16,7 @@ const translations = {
     // Navigation
     "nav.dashboard": "Beranda",
     "nav.roomInfo": "Info Ruangan",
-    "nav.myBookings": "Booking Saya",
+    "nav.myBookings": "Booking",
     "nav.roomBooking": "Pesan Ruangan",
     "nav.history": "Riwayat",
     "nav.settings": "Pengaturan",
@@ -224,7 +224,7 @@ const translations = {
     // Navigation
     "nav.dashboard": "Dashboard",
     "nav.roomInfo": "Room Info",
-    "nav.myBookings": "My Bookings",
+    "nav.myBookings": "Bookings",
     "nav.roomBooking": "Book Room",
     "nav.history": "History",
     "nav.settings": "Settings",
